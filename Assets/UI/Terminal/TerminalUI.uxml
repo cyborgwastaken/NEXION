@@ -1,0 +1,15 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi:noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" editor-extension-mode="False">
+    <ui:Style src="TerminalUI.uss" />
+    <ui:VisualElement name="TerminalRoot" class="terminal-root">
+        <ui:VisualElement name="TerminalWindow" class="terminal-window">
+            <ui:Label name="TitleLabel" text="AXIOM SECURE TERMINAL" class="terminal-title" />
+            <ui:ScrollView name="LogScroll" class="terminal-log-scroll">
+                <ui:Label name="LogLabel" text="" class="terminal-log" />
+            </ui:ScrollView>
+            <ui:VisualElement class="terminal-input-row">
+                <ui:Label text="&gt;" class="terminal-prompt" />
+                <ui:TextField name="CommandInput" class="terminal-input" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

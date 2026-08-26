@@ -93,9 +93,43 @@ The full palette, material recipes, and exact override values referenced below l
 
 ---
 
+## Session 2 (2026-08-26) — Terminal Hacking Puzzle System
+
+Scripts landed this session: `TerminalPuzzle` (`Assets/Scripts/Puzzles/TerminalPuzzle.cs`), `TerminalUIController` (`Assets/Scripts/UI/TerminalUIController.cs`), plus a UI Toolkit screen at `Assets/UI/Terminal/TerminalUI.uxml` + `TerminalUI.uss`.
+
+How it works: a `TerminalPuzzle` is an `IInteractable` that only opens in **C-MODE** (per the doc — terminals are noise in H-MODE). Interacting opens a shared terminal UI where you type commands: `scan` (hint), `bypass <code>` (attempt the access code), `exit` (close). Solving it fires a `UnityEvent` you can wire to anything (a door, a light, a log message) in the Inspector — no extra code needed for that part.
+
+### Step 7 — Panel Settings asset (one-time, shared by all UI Toolkit screens)
+
+1. In the Project window, right-click `Assets/UI/Terminal/` → **Create → UI Toolkit → Panel Settings Asset**. Name it `TerminalPanelSettings`.
+2. Leave its default settings as-is (Scale Mode: Constant Pixel Size is fine for now).
+
+### Step 8 — Terminal UI object
+
+1. Create Empty in the Hierarchy → name it `TerminalUI`.
+2. Add Component → **UI Document**.
+   - **Panel Settings** → drag in `TerminalPanelSettings`.
+   - **Source Asset** → drag in `Assets/UI/Terminal/TerminalUI.uxml`.
+3. Add Component → `Terminal UI Controller` (`Nexion.UI.TerminalUIController`).
+   - **Player Controller** → drag in the `Player` object (it has the `Player Controller` component from Session 1).
+   - **Player Interactor** → drag in the `Player` object again (same object, `Player Interactor` component).
+4. Play mode should show nothing yet — the screen is hidden until a terminal is opened. If you instead see the terminal window covering the screen at all times, double check `TerminalUI.uxml` still has `TerminalRoot`'s display driven by the controller (it should auto-hide via `Close()` in `Awake`) — most likely cause is the `UI Document` component's Source Asset wasn't assigned.
+
+### Step 9 — A terminal to test on
+
+1. Create a **Cube** a few meters from the player spawn (like `TestTerminal` from Session 1, but this one's real). Name it `Terminal_Firewall01`.
+2. Add Component → `Terminal Puzzle` (`Nexion.Puzzles.TerminalPuzzle`).
+   - Leave the default fields (`Access Code: 7731` is the doc's own example — Kael's sister's birthday, LOCK_ID 7731). Change title/hint/code text if you want something custom.
+   - **Require Cpu Mode** stays checked.
+3. Optional: wire **On Solved** in the Inspector to something visible for testing — e.g. drag any GameObject in and pick `GameObject → SetActive` to toggle a light or door stand-in. Not required to test the core loop.
+
+**Test now:** Play mode. Walk up to `Terminal_Firewall01` **without** holding `E` and press `F` — Console should log "signal unreadable" and nothing opens (confirms the C-MODE gate works). Now hold `E` and press `F` — the terminal window should appear, cursor should unlock, and player movement/look should freeze. Type `scan` + Enter → see the hint. Type `bypass 7731` + Enter → "ACCESS GRANTED", window auto-closes after ~1.2s, controls and cursor lock restore. Try interacting again — should log "ACCESS ALREADY GRANTED" instead of re-opening a fresh puzzle.
+
+---
+
 ## What to do when you hit the next step
 
-Steps 4–9 in `steps.md` (terminal hacking, keypad/cipher, dialogue, memory fragments, economy, audio) aren't built yet. When you're ready for the next one, ask for it specifically (e.g. "build the terminal hacking system") — this file will get a new dated section appended the same way Session 1 did, so you always have one place to look for "what do I click."
+Steps 5–9 in `steps.md` (keypad/cipher, dialogue, memory fragments, economy, audio) aren't built yet. When you're ready for the next one, ask for it specifically (e.g. "build the keypad/cipher system") — this file will get a new dated section appended the same way Sessions 1–2 did, so you always have one place to look for "what do I click."
 
 ---
 
@@ -109,3 +143,5 @@ Steps 4–9 in `steps.md` (terminal hacking, keypad/cipher, dialogue, memory fra
 | `ModeVisualController` | `NEXION_Systems` | `Human Volume` → `Volume_Human`, `Cpu Volume` → `Volume_CPU` |
 | `DebugInteractable` | any test object (e.g. `TestTerminal`) | (none — self-contained) |
 | `IInteractable` | — (interface, not a component) | implemented by any script that needs to be interactable |
+| `TerminalUIController` | `TerminalUI` (needs a `UI Document` component too) | `Player Controller` → `Player`, `Player Interactor` → `Player` |
+| `TerminalPuzzle` | any terminal object (e.g. `Terminal_Firewall01`) | (none required — optionally wire `On Solved`) |

@@ -1,0 +1,69 @@
+.terminal-root {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.55);
+}
+
+.terminal-window {
+    width: 60%;
+    max-width: 720px;
+    height: 55%;
+    max-height: 480px;
+    background-color: rgb(10, 10, 10);
+    border-width: 2px;
+    border-color: rgb(0, 255, 255);
+    padding: 12px;
+    flex-direction: column;
+}
+
+.terminal-title {
+    color: rgb(0, 255, 255);
+    font-size: 16px;
+    -unity-font-style: bold;
+    margin-bottom: 8px;
+}
+
+.terminal-log-scroll {
+    flex-grow: 1;
+    background-color: rgb(5, 0, 10);
+    border-width: 1px;
+    border-color: rgb(26, 0, 48);
+    margin-bottom: 8px;
+}
+
+.terminal-log {
+    color: rgb(0, 255, 255);
+    white-space: normal;
+    padding: 6px;
+    font-size: 13px;
+}
+
+.terminal-input-row {
+    flex-direction: row;
+    align-items: center;
+}
+
+.terminal-prompt {
+    color: rgb(0, 255, 255);
+    margin-right: 4px;
+    font-size: 14px;
+}
+
+.terminal-input {
+    flex-grow: 1;
+    color: rgb(0, 255, 255);
+    background-color: rgb(5, 0, 10);
+    border-width: 1px;
+    border-color: rgb(0, 255, 255);
+}
+
+.terminal-input .unity-text-field__input {
+    background-color: rgb(5, 0, 10);
+    color: rgb(0, 255, 255);
+    border-width: 0;
+}

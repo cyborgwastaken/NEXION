@@ -31,12 +31,12 @@
 - [x] `DebugInteractable` (test-only)
 - [ ] On-screen interaction prompt UI (currently `InteractionPrompt` string exists but nothing displays it — needs a UI Toolkit or Canvas prompt bound to `PlayerInteractor.CurrentTarget`)
 
-### Step 4 — Terminal Hacking Puzzle System (not started)
-- [ ] `TerminalPuzzle : MonoBehaviour, IInteractable` — text command interface
-- [ ] Command parser (small allow-list of commands per puzzle)
-- [ ] Firewall/lock state machine
-- [ ] UI: terminal screen (diegetic, monospace font per visual language)
-- [ ] Should only be enterable in C-MODE (or require C-MODE to progress once inside — decide during design pass)
+### Step 4 — Terminal Hacking Puzzle System ✅ (Session 2)
+- [x] `TerminalPuzzle : MonoBehaviour, IInteractable` — text command interface
+- [x] Command parser (`scan`, `bypass <code>`, `exit`, `help`)
+- [x] Firewall/lock state — binary solved/unsolved with a single access code (not a multi-stage state machine yet — revisit if a puzzle needs more than one gate)
+- [x] UI: terminal screen via UI Toolkit (`Assets/UI/Terminal/TerminalUI.uxml` + `.uss`), styled from visual_design.md palette — monospace font asset not yet imported, using panel default font (see progress.md gap)
+- [x] Only enterable in C-MODE (`Require Cpu Mode` toggle on `TerminalPuzzle`, on by default)
 
 ### Step 5 — Keypad / Cipher System (not started)
 - [ ] `KeypadPuzzle : MonoBehaviour, IInteractable` — numeric/symbol entry
@@ -90,4 +90,4 @@
 
 ## Immediate next action
 
-Wire up Step 1–3's scripts in the Editor (see [guide.md](guide.md)) and confirm the mode switch + interaction loop actually works in Play mode before starting Step 4 (terminal hacking). Don't build puzzle content on top of an unverified foundation.
+Wire up Step 4's terminal scripts in the Editor (see guide.md Session 2) and confirm the C-MODE gate + command loop actually works in Play mode before starting Step 5 (keypad/cipher system).

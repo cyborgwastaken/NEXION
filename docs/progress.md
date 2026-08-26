@@ -36,7 +36,15 @@ Scripts written so far read devices directly (`Keyboard.current`, `Mouse.current
 | `PlayerInteractor` | `Assets/Scripts/Interaction/PlayerInteractor.cs` | done | Raycasts from camera, calls `Interact()` on `[F]` / gamepad West |
 | `DebugInteractable` | `Assets/Scripts/Interaction/DebugInteractable.cs` | done | Throwaway test target — logs to console, nothing more |
 
-**Not yet implemented** (see steps.md for order): terminal hacking puzzle, keypad/cipher system, branching dialogue engine, memory fragment collectibles, currency/economy managers, upgrade trees, mode-reactive audio, actual level geometry.
+## Scripts implemented (Session 2 — 2026-08-26)
+
+| Script | Path | Status | Purpose |
+|---|---|---|---|
+| `TerminalPuzzle` | `Assets/Scripts/Puzzles/TerminalPuzzle.cs` | done | `IInteractable` terminal puzzle, C-MODE gated, command parser (`scan`/`bypass <code>`/`exit`/`help`), fires `onSolved` UnityEvent |
+| `TerminalUIController` | `Assets/Scripts/UI/TerminalUIController.cs` | done | Owns the shared terminal UI Toolkit screen; opens/closes it, disables player controller + interactor while open |
+| `TerminalUI.uxml` / `.uss` | `Assets/UI/Terminal/` | done | The actual terminal screen — log scroll view + command input, styled from visual_design.md's Void Black / Signal Cyan palette |
+
+**Not yet implemented** (see steps.md for order): keypad/cipher system, branching dialogue engine, memory fragment collectibles, currency/economy managers, upgrade trees, mode-reactive audio, actual level geometry.
 
 ---
 
@@ -47,3 +55,7 @@ Scripts written so far read devices directly (`Keyboard.current`, `Mouse.current
 - No scene has been built yet. All wiring instructions in guide.md assume you're starting from the existing `Assets/OutdoorsScene.unity` or a new empty scene.
 - `interactableMask` on `PlayerInteractor` defaults to "everything" — fine for prototyping, but once real levels exist this should be narrowed to an `Interactable` layer for performance and to avoid raycasting through puzzle set dressing.
 - Visual design is now **specified** (`docs/visual_design.md` — palette, material recipes, exact HDRP Volume override values) but not yet **authored** as actual Volume Profile / Volume assets in the Editor. Guide.md Step 5 walks through creating them; nothing renders differently until that's done in-Editor.
+- `TerminalUI` uses the UI Toolkit runtime default font, not the JetBrains Mono / Source Code Pro spec'd in visual_design.md §2 — no font asset has been imported into the project yet. Swap it in later via the Panel Settings / USS `-unity-font-definition` once a font asset exists.
+- `TerminalPuzzle`'s "firewall" is a single access-code check, not a multi-stage lock. Fine for a first working puzzle; the doc's hybrid-puzzle example (C-MODE reveals `LOCK_ID: 7731`, H-MODE recalls it's a birthday) isn't wired to the memory fragment system yet since that system doesn't exist — `accessCode` is just a hardcoded Inspector field for now.
+- Escape-to-close on the terminal only works while the command `TextField` has UI focus. If the player clicks elsewhere and focus is lost, Escape won't close it (only `exit` command or solving it will). Minor, revisit if it's actually annoying in practice.
+- **Fixed (2026-08-26):** `TerminalUIController.cs` had `CS0104` ambiguous-reference compile errors on `Cursor` — `UnityEngine.UIElements` defines its own `Cursor` type (for UI Toolkit mouse-cursor styling) which collides with `UnityEngine.Cursor`. Any future script that has `using UnityEngine.UIElements;` and also needs to touch `Cursor.lockState`/`Cursor.visible` must fully qualify it as `UnityEngine.Cursor`.
