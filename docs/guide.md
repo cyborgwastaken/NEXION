@@ -2,7 +2,7 @@
 
 > This is the file to follow while sitting in the Unity Editor. It tells you exactly what GameObjects and components to create, and what script fields to drag where. It gets updated after every batch of new scripts — always re-read the top section before starting a session, in case something changed.
 >
-> Companion files: [steps.md](steps.md) (what's left, in order) · [progress.md](progress.md) (what exists and why).
+> Companion files: [steps.md](steps.md) (what's left, in order) · [progress.md](progress.md) (what exists and why) · [visual_design.md](visual_design.md) (exact colors/material/Volume values, referenced in Step 5).
 
 Engine: Unity 6000.5.9f1, HDRP 17.5.0. Open `Assets/OutdoorsScene.unity` (or create a new empty scene) to do this setup.
 
@@ -52,17 +52,38 @@ At this point you have a working FPS rig: WASD to move, mouse to look, Space to 
 
 ### Step 5 — Mode-reactive visuals (HDRP Volumes)
 
-1. Create Empty → name it `Volume_Human`. Add Component → **Volume** (search "Volume", it's `UnityEngine.Rendering.Volume`).
+The full palette, material recipes, and exact override values referenced below live in [visual_design.md](visual_design.md) — this is now the source of truth for every number in this step. Add each override via the Volume component's **Add Override** button, then punch in the value from the table.
+
+**5a — Baseline volume (do this first)**
+
+1. Create Empty → name it `Volume_WorldDefault`. Add Component → **Volume**.
    - Check **Is Global**.
-   - Next to **Profile**, click **New** to create a fresh Volume Profile. Save it as `Assets/Settings/HDRPDefaultResources/VP_HumanMode.asset` (or wherever you keep profiles).
-   - **Weight**: set to `0` — the script drives this at runtime, don't leave it at 1 or it'll always be visible in the Editor.
-   - Add overrides matching the doc's visual language for H-MODE: **Vignette** (subtle), **Color Adjustments** (warm amber/orange push), maybe a light **Chromatic Aberration** at frame edges. This is an art pass — tune to taste.
-2. Repeat for `Volume_CPU`:
-   - New profile: `VP_CPUMode.asset`.
-   - Weight `0`.
-   - Overrides: **Color Adjustments** (cold cyan/green), stronger **Chromatic Aberration** or a data-overlay-style effect if you have one, maybe **Bloom** bumped up slightly for the "everything is emissive data" feel.
-3. Select `NEXION_Systems`. Add Component → `Mode Visual Controller` (`Nexion.Systems.ModeVisualController`).
-4. Drag `Volume_Human` into **Human Volume**, `Volume_CPU` into **Cpu Volume**.
+   - New Profile → save as `Assets/Settings/HDRPDefaultResources/VP_WorldDefault.asset`.
+   - **Weight**: `1` (this one is always fully on — it's the neutral baseline, not something the script blends).
+   - Add overrides and values from visual_design.md §5, **VP_WorldDefault** table: Color Adjustments, Vignette, Fog, Bloom, and enable Screen Space Reflection.
+   - This is also where the wet-reflective-floor and neon-emissive material recipes (§3) become visible — SSR needs to be on for reflective floors to show anything.
+   - **If the SSR override shows "The current HDRP Asset does not support Screen Space Reflection":** that's a pipeline-level setting, not a Volume one. Click the **Open** button in the warning (or Edit → Project Settings → Graphics → click the SRP Settings asset), then under the HDRP Asset's **Lighting → Reflections**, check **Screen Space Reflection**. Also check Edit → Project Settings → HDRP Default Settings → Default Frame Settings (Camera) → Lighting → **Screen Space Reflection** — both the asset and the frame settings need it enabled.
+
+**5b — Human volume**
+
+1. Create Empty → name it `Volume_Human`. Add Component → **Volume**.
+   - Check **Is Global**.
+   - New Profile → save as `Assets/Settings/HDRPDefaultResources/VP_HumanMode.asset`.
+   - **Weight**: `0` — the script drives this at runtime; leaving it at 1 makes it always-visible in the Editor.
+   - Add overrides and values from visual_design.md §5, **VP_HumanMode** table: Color Adjustments, Vignette, Chromatic Aberration, Film Grain.
+
+**5c — CPU volume**
+
+1. Create Empty → name it `Volume_CPU`. Add Component → **Volume**.
+   - Check **Is Global**.
+   - New Profile → save as `Assets/Settings/HDRPDefaultResources/VP_CPUMode.asset`.
+   - **Weight**: `0`.
+   - Add overrides and values from visual_design.md §5, **VP_CPUMode** table: Color Adjustments, Vignette, Chromatic Aberration, Bloom, optionally Lens Distortion.
+
+**5d — Wire the controller**
+
+1. Select `NEXION_Systems`. Add Component → `Mode Visual Controller` (`Nexion.Systems.ModeVisualController`).
+2. Drag `Volume_Human` into **Human Volume**, `Volume_CPU` into **Cpu Volume**. (`Volume_WorldDefault` doesn't get wired to anything — it's always on by itself.)
 
 **Test now:** Play mode, hold `Q` — screen should ease into the warm/amber profile over about a third of a second (0.5s switch delay + blend speed). Hold `E` — should ease into cyan. Release both — back to neutral (both volumes fade to weight 0).
 

@@ -1,6 +1,6 @@
 # NEX//ION — Progress Log
 
-> Snapshot of what actually exists in the project right now. Updated after every implementation session. For the full roadmap see [steps.md](steps.md); for editor wiring instructions see [guide.md](guide.md).
+> Snapshot of what actually exists in the project right now. Updated after every implementation session. For the full roadmap see [steps.md](steps.md); for editor wiring instructions see [guide.md](guide.md); for the palette/material/Volume design spec see [visual_design.md](visual_design.md).
 
 Last updated: **2026-08-26**
 
@@ -46,3 +46,4 @@ Scripts written so far read devices directly (`Keyboard.current`, `Mouse.current
 - `ModeVisualController` only drives `Volume.weight`. It does not touch audio (heartbeat vs. electronic hum per the doc) — that's a separate `ModeAudioController` to add later, same pattern.
 - No scene has been built yet. All wiring instructions in guide.md assume you're starting from the existing `Assets/OutdoorsScene.unity` or a new empty scene.
 - `interactableMask` on `PlayerInteractor` defaults to "everything" — fine for prototyping, but once real levels exist this should be narrowed to an `Interactable` layer for performance and to avoid raycasting through puzzle set dressing.
+- Visual design is now **specified** (`docs/visual_design.md` — palette, material recipes, exact HDRP Volume override values) but not yet **authored** as actual Volume Profile / Volume assets in the Editor. Guide.md Step 5 walks through creating them; nothing renders differently until that's done in-Editor.

@@ -70,9 +70,10 @@
 - [ ] Populate levels with puzzle instances, memory fragments, NPCs using systems above
 
 ## Phase 4 — Visual Pipeline (Sep 2026 – Feb 2027)
-- [ ] HDRP Volume Profiles: `VP_HumanMode`, `VP_CPUMode` (see guide.md Step 1 for the GameObjects; profile contents — Vignette, Color Adjustments, Chromatic Aberration — are an art pass)
-- [ ] Glitch VFX Graph effects (chromatic aberration, pixel displacement, scan lines) tied to narrative beats
-- [ ] Shader Graph materials: emissive neon tubes, wet reflective floors
+- [x] Visual design system specified — palette, material recipes, Volume override values ([visual_design.md](visual_design.md))
+- [ ] HDRP Volume Profiles authored in-Editor: `VP_WorldDefault`, `VP_HumanMode`, `VP_CPUMode` (values specified, not yet created as assets — see guide.md Session 1 / Step 5)
+- [ ] Glitch VFX Graph effects (chromatic aberration bursts, pixel displacement, scan lines) tied to narrative beats — event-driven layer on top of the baseline Volumes, per visual_design.md §4
+- [ ] Shader Graph materials: emissive neon tubes, wet reflective floors (recipes specified in visual_design.md §3, not yet built as Shader Graph assets)
 - [ ] UI Toolkit HUD (diegetic, minimal)
 
 ## Phase 5 — Testing & QA (Jan – Feb 2027)
