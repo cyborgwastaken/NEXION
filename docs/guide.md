@@ -2,7 +2,7 @@
 
 > This is the file to follow while sitting in the Unity Editor. It tells you exactly what GameObjects and components to create, and what script fields to drag where. It gets updated after every batch of new scripts — always re-read the top section before starting a session, in case something changed.
 >
-> Companion files: [steps.md](steps.md) (what's left, in order) · [progress.md](progress.md) (what exists and why) · [visual_design.md](visual_design.md) (exact colors/material/Volume values, referenced in Step 5).
+> Companion files: [steps.md](steps.md) (what's left, in order) · [progress.md](progress.md) (what exists and why) · [visual_design.md](visual_design.md) (exact colors/material/Volume values, referenced in Step 5) · [puzzles.md](puzzles.md) (the real 23-puzzle content spec — Sessions 2–3 below are reusable UI shells, not puzzle implementations).
 
 Engine: Unity 6000.5.9f1, HDRP 17.5.0. Open `Assets/OutdoorsScene.unity` (or create a new empty scene) to do this setup.
 
@@ -127,9 +127,37 @@ How it works: a `TerminalPuzzle` is an `IInteractable` that only opens in **C-MO
 
 ---
 
+## Session 3 (2026-08-26) — Keypad / Cipher System
+
+Scripts landed this session: `KeypadPuzzle` (`Assets/Scripts/Puzzles/KeypadPuzzle.cs`), `KeypadUIController` (`Assets/Scripts/UI/KeypadUIController.cs`), plus a UI Toolkit screen at `Assets/UI/Keypad/KeypadUI.uxml` + `KeypadUI.uss`.
+
+How it works: a `KeypadPuzzle` is an `IInteractable`, same C-MODE gate as `TerminalPuzzle`, but the interaction itself is different — a fixed-length numeric code entered on an on-screen keypad (click the digit buttons, or type digits/numpad/Enter/Backspace on the keyboard). This is deliberately a different feel from the terminal's free-text commands, matching the doc's "environmental code puzzle" description of keypads vs. the terminal's "hacking console" description.
+
+### Step 10 — Keypad UI object
+
+1. Create Empty in the Hierarchy → name it `KeypadUI`.
+2. Add Component → **UI Document**.
+   - **Panel Settings** → drag in the same `TerminalPanelSettings` asset from Session 2 (Panel Settings just controls rendering/scaling, not content — no need for a second one).
+   - **Source Asset** → drag in `Assets/UI/Keypad/KeypadUI.uxml`.
+3. Add Component → `Keypad UI Controller` (`Nexion.UI.KeypadUIController`).
+   - **Player Controller** → drag in the `Player` object.
+   - **Player Interactor** → drag in the `Player` object again.
+
+### Step 11 — A keypad to test on
+
+1. Create a **Cube** a few meters from the player spawn. Name it `Keypad_Door01`.
+2. Add Component → `Keypad Puzzle` (`Nexion.Puzzles.KeypadPuzzle`).
+   - Default **Code** is `1234` (a placeholder — customize per lock once you're building real levels; it's deliberately different from the Terminal's `7731` so the two test objects don't feel like duplicates).
+   - **Require Cpu Mode** stays checked.
+3. Optional: wire **On Solved** in the Inspector the same way as the terminal (e.g. to a door/light stand-in).
+
+**Test now:** Play mode. Hold `E` (C-MODE) and press `F` on `Keypad_Door01` — the keypad UI should appear with an on-screen numpad, cursor unlocked, player controls frozen. Click `1`, `2`, `3`, `4` — the display should fill in as you go. Click `OK` (or press Enter) — "ACCESS GRANTED", auto-closes after 1s. Try again with a wrong code (e.g. `9999`) first — should show "ACCESS DENIED" and clear the buffer without closing. Also confirm typing digits on the keyboard works the same as clicking.
+
+---
+
 ## What to do when you hit the next step
 
-Steps 5–9 in `steps.md` (keypad/cipher, dialogue, memory fragments, economy, audio) aren't built yet. When you're ready for the next one, ask for it specifically (e.g. "build the keypad/cipher system") — this file will get a new dated section appended the same way Sessions 1–2 did, so you always have one place to look for "what do I click."
+Steps 6–9 in `steps.md` (dialogue, memory fragments, economy, audio) aren't built yet — nor is Sprint 1 of the actual puzzle content in [puzzles.md](puzzles.md). When you're ready for the next one, ask for it specifically — this file will get a new dated section appended the same way Sessions 1–3 did, so you always have one place to look for "what do I click."
 
 ---
 
@@ -145,3 +173,5 @@ Steps 5–9 in `steps.md` (keypad/cipher, dialogue, memory fragments, economy, a
 | `IInteractable` | — (interface, not a component) | implemented by any script that needs to be interactable |
 | `TerminalUIController` | `TerminalUI` (needs a `UI Document` component too) | `Player Controller` → `Player`, `Player Interactor` → `Player` |
 | `TerminalPuzzle` | any terminal object (e.g. `Terminal_Firewall01`) | (none required — optionally wire `On Solved`) |
+| `KeypadUIController` | `KeypadUI` (needs a `UI Document` component too) | `Player Controller` → `Player`, `Player Interactor` → `Player` |
+| `KeypadPuzzle` | any keypad object (e.g. `Keypad_Door01`) | (none required — optionally wire `On Solved` / `On Failed`) |

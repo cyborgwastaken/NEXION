@@ -1,6 +1,6 @@
 # NEX//ION — Progress Log
 
-> Snapshot of what actually exists in the project right now. Updated after every implementation session. For the full roadmap see [steps.md](steps.md); for editor wiring instructions see [guide.md](guide.md); for the palette/material/Volume design spec see [visual_design.md](visual_design.md).
+> Snapshot of what actually exists in the project right now. Updated after every implementation session. For the full roadmap see [steps.md](steps.md); for editor wiring instructions see [guide.md](guide.md); for the palette/material/Volume design spec see [visual_design.md](visual_design.md); for the actual 23-puzzle content spec see [challenges.md](challenges.md), tracked in [puzzles.md](puzzles.md).
 
 Last updated: **2026-08-26**
 
@@ -44,7 +44,15 @@ Scripts written so far read devices directly (`Keyboard.current`, `Mouse.current
 | `TerminalUIController` | `Assets/Scripts/UI/TerminalUIController.cs` | done | Owns the shared terminal UI Toolkit screen; opens/closes it, disables player controller + interactor while open |
 | `TerminalUI.uxml` / `.uss` | `Assets/UI/Terminal/` | done | The actual terminal screen — log scroll view + command input, styled from visual_design.md's Void Black / Signal Cyan palette |
 
-**Not yet implemented** (see steps.md for order): keypad/cipher system, branching dialogue engine, memory fragment collectibles, currency/economy managers, upgrade trees, mode-reactive audio, actual level geometry.
+## Scripts implemented (Session 3 — 2026-08-26)
+
+| Script | Path | Status | Purpose |
+|---|---|---|---|
+| `KeypadPuzzle` | `Assets/Scripts/Puzzles/KeypadPuzzle.cs` | done | `IInteractable` keypad puzzle, C-MODE gated, fixed-length numeric code, `onSolved`/`onFailed` UnityEvents |
+| `KeypadUIController` | `Assets/Scripts/UI/KeypadUIController.cs` | done | Owns the shared keypad UI Toolkit screen — clickable digit buttons + keyboard digit/backspace/enter fallback |
+| `KeypadUI.uxml` / `.uss` | `Assets/UI/Keypad/` | done | The keypad screen — numeric display + 3x4 button grid, same palette as the terminal |
+
+**Not yet implemented** (see steps.md for order): branching dialogue engine, memory fragment collectibles, currency/economy managers, upgrade trees, mode-reactive audio, actual level geometry.
 
 ---
 
@@ -58,4 +66,13 @@ Scripts written so far read devices directly (`Keyboard.current`, `Mouse.current
 - `TerminalUI` uses the UI Toolkit runtime default font, not the JetBrains Mono / Source Code Pro spec'd in visual_design.md §2 — no font asset has been imported into the project yet. Swap it in later via the Panel Settings / USS `-unity-font-definition` once a font asset exists.
 - `TerminalPuzzle`'s "firewall" is a single access-code check, not a multi-stage lock. Fine for a first working puzzle; the doc's hybrid-puzzle example (C-MODE reveals `LOCK_ID: 7731`, H-MODE recalls it's a birthday) isn't wired to the memory fragment system yet since that system doesn't exist — `accessCode` is just a hardcoded Inspector field for now.
 - Escape-to-close on the terminal only works while the command `TextField` has UI focus. If the player clicks elsewhere and focus is lost, Escape won't close it (only `exit` command or solving it will). Minor, revisit if it's actually annoying in practice.
-- **Fixed (2026-08-26):** `TerminalUIController.cs` had `CS0104` ambiguous-reference compile errors on `Cursor` — `UnityEngine.UIElements` defines its own `Cursor` type (for UI Toolkit mouse-cursor styling) which collides with `UnityEngine.Cursor`. Any future script that has `using UnityEngine.UIElements;` and also needs to touch `Cursor.lockState`/`Cursor.visible` must fully qualify it as `UnityEngine.Cursor`.
+- **Fixed (2026-08-26):** `TerminalUIController.cs` had `CS0104` ambiguous-reference compile errors on `Cursor` — `UnityEngine.UIElements` defines its own `Cursor` type (for UI Toolkit mouse-cursor styling) which collides with `UnityEngine.Cursor`. Any future script that has `using UnityEngine.UIElements;` and also needs to touch `Cursor.lockState`/`Cursor.visible` must fully qualify it as `UnityEngine.Cursor`. `KeypadUIController.cs` already does this correctly.
+- `KeypadPuzzle`'s code is a static string, not a generated cipher — matches the doc's "Keypad / Cipher System" name in spirit (numeric entry, environmental lock) but not yet the "pattern recognition, signal tracing" cipher-generation part. Revisit once a level actually needs procedurally varied codes rather than one fixed number per lock.
+- Two separate UI Toolkit screens now exist (Terminal, Keypad) sharing one `TerminalPanelSettings` asset — that's intentional (Panel Settings only controls rendering/scaling, not content) and keeps from needing a near-identical asset per puzzle type. If that naming bothers you later, renaming it to something generic like `NexionPanelSettings` is a safe find-and-reassign in the Inspector, not a code change.
+
+## Correction (2026-08-27) — challenges.md changes what "puzzle system" means here
+
+`docs/challenges.md` landed with a fully-specified 23-puzzle content design (exact solutions, UI layouts, fail states) — a different and more concrete layer than anything built so far. Reconciling it with the sessions above:
+
+- `TerminalPuzzle`/`TerminalUIController` and `KeypadPuzzle`/`KeypadUIController` are **reusable interaction infrastructure**, not implementations of any of the 23 puzzle IDs in challenges.md. Nothing in Sessions 2–3 should be read as "a puzzle is done." See `docs/puzzles.md` for the actual puzzle-by-puzzle tracker (currently: 0 of 23 built) and `docs/steps.md` Steps 4–5 for the corrected wording.
+- challenges.md has its own Sprint 1–5 build order, which is now the authoritative next-steps sequence for puzzle content (starts with C-01 Binary Door, H-01 Neon Sequence, C-03 ROT13 Terminal). `steps.md`'s "Immediate next action" has been updated to point here instead of continuing with Step 6 (dialogue engine) — puzzle content is the more concrete, better-specified work right now.

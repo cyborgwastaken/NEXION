@@ -1,6 +1,6 @@
 # NEX//ION — Implementation Steps
 
-> Full engineering roadmap, derived from the Gantt chart in `nexion_synopsis_context.md` (Phases 1–6). Check items off as they land. Granular near-term, coarser further out — refine each phase's steps as you get close to it. Cross-reference: [progress.md](progress.md) for what's actually done, [guide.md](guide.md) for how to wire each step into the Editor.
+> Full engineering roadmap, derived from the Gantt chart in `nexion_synopsis_context.md` (Phases 1–6). Check items off as they land. Granular near-term, coarser further out — refine each phase's steps as you get close to it. Cross-reference: [progress.md](progress.md) for what's actually done, [guide.md](guide.md) for how to wire each step into the Editor, [puzzles.md](puzzles.md) for the actual 23-puzzle content spec that Steps 4–5 below turned out to be infrastructure for, not implementations of.
 
 ---
 
@@ -22,7 +22,8 @@
 ### Step 2 — Player controller ✅ (this session)
 - [x] First-person move/look (`CharacterController`)
 - [x] C-MODE 0.3s input lag penalty
-- [ ] H-MODE stamina system (crouch, sprint, fatigue) — stubbed nowhere yet, needed before Neural Tree's "Somatic Map" upgrade makes sense
+- [x] Basic sprint (Shift, flat speed multiplier — added on disk between sessions)
+- [ ] H-MODE stamina system (crouch, fatigue) — sprint exists but isn't gated by stamina yet, needed before Neural Tree's "Somatic Map" upgrade makes sense
 - [ ] Third-person camera option (doc lists first/third person as TBD — first-person implemented first; revisit if TBD resolves to third-person)
 
 ### Step 3 — Interaction framework ✅ (this session)
@@ -31,17 +32,19 @@
 - [x] `DebugInteractable` (test-only)
 - [ ] On-screen interaction prompt UI (currently `InteractionPrompt` string exists but nothing displays it — needs a UI Toolkit or Canvas prompt bound to `PlayerInteractor.CurrentTarget`)
 
-### Step 4 — Terminal Hacking Puzzle System ✅ (Session 2)
+### Step 4 — Terminal interaction shell ✅ (Session 2) — infrastructure, not puzzle content
 - [x] `TerminalPuzzle : MonoBehaviour, IInteractable` — text command interface
 - [x] Command parser (`scan`, `bypass <code>`, `exit`, `help`)
 - [x] Firewall/lock state — binary solved/unsolved with a single access code (not a multi-stage state machine yet — revisit if a puzzle needs more than one gate)
 - [x] UI: terminal screen via UI Toolkit (`Assets/UI/Terminal/TerminalUI.uxml` + `.uss`), styled from visual_design.md palette — monospace font asset not yet imported, using panel default font (see progress.md gap)
 - [x] Only enterable in C-MODE (`Require Cpu Mode` toggle on `TerminalPuzzle`, on by default)
+- **Correction (2026-08-27):** this is a generic "read a screen, type a command" shell — it does not implement any specific puzzle. The actual C-MODE puzzle content is specified in [challenges.md](challenges.md) (C-01 through C-10) and tracked in [puzzles.md](puzzles.md). `TerminalUIController`'s open/close/lock-player pattern is a good base for the terminal-style ones (C-01, C-02, C-03, C-06, C-07) — none of them are built yet.
 
-### Step 5 — Keypad / Cipher System (not started)
-- [ ] `KeypadPuzzle : MonoBehaviour, IInteractable` — numeric/symbol entry
-- [ ] Cipher generation/validation logic (pattern recognition, signal tracing per doc)
-- [ ] Hybrid variant: code requires an H-MODE-recovered memory fragment as input (per the "LOCK_ID: 7731 = sister's birthday" example in the doc)
+### Step 5 — Keypad interaction shell ✅ (Session 3) — infrastructure, not puzzle content
+- [x] `KeypadPuzzle : MonoBehaviour, IInteractable` — fixed-length numeric code entry
+- [x] Validation logic (exact code match; on-screen numpad UI + keyboard digit fallback)
+- [x] Only enterable in C-MODE (`Require Cpu Mode` toggle, on by default)
+- **Correction (2026-08-27):** same caveat as Step 4 — this is a generic numeric-entry shell, not one of the 23 puzzles in challenges.md. None of them are "recall a memorized digit code," so `KeypadUIController` doesn't map directly onto any puzzle ID; it stays available as a UI pattern if something later needs raw digit entry. See [puzzles.md](puzzles.md) for the real puzzle roadmap and its own Sprint-based build order (Sprint 1: C-01 Binary Door, H-01 Neon Sequence, C-03 ROT13 Terminal).
 
 ### Step 6 — Branching Dialogue Engine (not started)
 - [ ] Decide: custom C# system vs. Yarn Spinner (doc lists both; custom gives more control over H/C-MODE gating of dialogue options, Yarn Spinner is faster to author in bulk)
@@ -90,4 +93,4 @@
 
 ## Immediate next action
 
-Wire up Step 4's terminal scripts in the Editor (see guide.md Session 2) and confirm the C-MODE gate + command loop actually works in Play mode before starting Step 5 (keypad/cipher system).
+Start Sprint 1 from [puzzles.md](puzzles.md): C-01 Binary Door, H-01 Neon Sequence, C-03 ROT13 Terminal. These are the actual puzzle content from challenges.md — Steps 4–5 above only built the reusable shells they can be built on top of.

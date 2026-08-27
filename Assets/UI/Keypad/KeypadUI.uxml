@@ -1,0 +1,32 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi:noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" editor-extension-mode="False">
+    <ui:Style src="KeypadUI.uss" />
+    <ui:VisualElement name="KeypadRoot" class="keypad-root">
+        <ui:VisualElement name="KeypadPanel" class="keypad-panel">
+            <ui:Label name="TitleLabel" text="SECURITY LOCK" class="keypad-title" />
+            <ui:Label name="DisplayLabel" text="____" class="keypad-display" />
+            <ui:Label name="StatusLabel" text="" class="keypad-status" />
+            <ui:VisualElement class="keypad-grid">
+                <ui:VisualElement class="keypad-row">
+                    <ui:Button name="Btn1" text="1" class="keypad-btn" />
+                    <ui:Button name="Btn2" text="2" class="keypad-btn" />
+                    <ui:Button name="Btn3" text="3" class="keypad-btn" />
+                </ui:VisualElement>
+                <ui:VisualElement class="keypad-row">
+                    <ui:Button name="Btn4" text="4" class="keypad-btn" />
+                    <ui:Button name="Btn5" text="5" class="keypad-btn" />
+                    <ui:Button name="Btn6" text="6" class="keypad-btn" />
+                </ui:VisualElement>
+                <ui:VisualElement class="keypad-row">
+                    <ui:Button name="Btn7" text="7" class="keypad-btn" />
+                    <ui:Button name="Btn8" text="8" class="keypad-btn" />
+                    <ui:Button name="Btn9" text="9" class="keypad-btn" />
+                </ui:VisualElement>
+                <ui:VisualElement class="keypad-row">
+                    <ui:Button name="BtnClear" text="C" class="keypad-btn keypad-btn-alt" />
+                    <ui:Button name="Btn0" text="0" class="keypad-btn" />
+                    <ui:Button name="BtnEnter" text="OK" class="keypad-btn keypad-btn-alt" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
