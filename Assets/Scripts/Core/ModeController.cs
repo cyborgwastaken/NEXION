@@ -1,6 +1,5 @@
 using System;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 namespace Nexion.Core
 {
@@ -71,10 +70,8 @@ namespace Nexion.Core
 
         private GameMode ReadRequestedMode()
         {
-            bool humanHeld = (Keyboard.current?.qKey.isPressed ?? false)
-                || (Gamepad.current?.leftTrigger.isPressed ?? false);
-            bool cpuHeld = (Keyboard.current?.eKey.isPressed ?? false)
-                || (Gamepad.current?.rightTrigger.isPressed ?? false);
+            bool humanHeld = InputManager.Instance != null && InputManager.Instance.HumanHeld;
+            bool cpuHeld = InputManager.Instance != null && InputManager.Instance.CpuHeld;
 
             if (humanHeld && !cpuHeld) return GameMode.Human;
             if (cpuHeld && !humanHeld) return GameMode.CPU;

@@ -155,9 +155,45 @@ How it works: a `KeypadPuzzle` is an `IInteractable`, same C-MODE gate as `Termi
 
 ---
 
+## Session 4 (2026-08-27) — Rebindable input (Input Actions migration)
+
+**Why:** every script up to this point read `Keyboard.current`/`Gamepad.current` directly — WASD, Q/E, Shift, F, Space were hardcoded. That's fine for prototyping but can't support a rebind-keys settings menu at ship time. This session moves all of that onto a proper Input Actions asset (`Assets/Settings/Input/NexionControls.inputactions`) via a new `InputManager`, which `PlayerController`, `ModeController`, and `PlayerInteractor` now read from instead of polling devices.
+
+**No default keybinds changed** — WASD move, mouse look, Space jump, Shift sprint, Q/E for H-MODE/C-MODE, F to interact are all still the defaults, just now data-driven instead of hardcoded. Gamepad defaults also added: left stick move, right stick look, South jump, left stick click sprint, West interact, left/right trigger for H/C-MODE.
+
+**Deliberately not covered:** Escape (pause/cursor-unlock) and the terminal/keypad UI screens' own key handling (digits, Enter, Backspace) stay hardcoded — those are UI/text-entry conventions, not the kind of action players expect a rebind menu to offer.
+
+**Not built yet:** the actual in-game rebind UI (a settings menu where the player clicks "rebind" and presses a new key). `InputManager.SaveBindings()` / `ResetBindings()` exist and persist via `PlayerPrefs` so that menu has something to call into later, but no menu exists yet — this session only makes rebinding *possible*, not player-facing.
+
+### Step 12 — Wire up InputManager
+
+1. Select `NEXION_Systems` (the same object `ModeController` and `ModeVisualController` live on).
+2. Add Component → `Input Manager` (`Nexion.Core.InputManager`).
+3. Drag `Assets/Settings/Input/NexionControls.inputactions` into the **Input Actions** field.
+
+**This step is not optional** — if `InputManager` isn't added and wired, there's no error or warning; the player will just silently stop responding to WASD/mouse look/Space/Shift/Q/E/F entirely (every script checks `InputManager.Instance != null` and no-ops otherwise). If Play mode suddenly does nothing after pulling these changes, this is almost certainly why.
+
+**Test now:** Play mode. Confirm WASD move, mouse look, Space jump, Shift sprint, Q/E mode switch (with the Volume crossfade from Session 1), and F interact (on `TestTerminal`/`Terminal_Firewall01`/`Keypad_Door01`) all still behave exactly as before. Nothing should look or feel different — this session is a plumbing swap, not a gameplay change.
+
+### Session 4 addendum (2026-08-27) — Controller support
+
+**You don't need to do anything new in the Editor for this** — the gamepad bindings were already in `NexionControls.inputactions` from Step 12 above (left stick move, right stick look, South button jump, left-stick-click sprint, West button interact, left/right trigger for H-MODE/C-MODE). Plug in an Xbox-layout controller (works out of the box) or a PS controller (usually fine via generic HID, no extra package needed) and the core loop should respond immediately — no PlayerInput component or per-scheme setup required, since `InputManager` reads from all bound devices at once rather than locking to one control scheme.
+
+**One real bug fixed:** the right stick was unusably slow. Mouse `<Pointer>/delta` reports an already-scaled per-frame pixel offset; a gamepad stick reports a normalized `-1..1` rate. Both were being read through the same `lookSensitivity` multiplier, so a fully-deflected stick barely turned the camera. `InputManager.LookDelta` now checks which device actually produced the value (`lookAction.activeControl?.device is Gamepad`) and scales stick input by a separate `gamepadLookSpeed` (Inspector field on `InputManager`, defaults to `180`) times `Time.deltaTime`, while mouse look is untouched. If stick look still feels too slow/fast once you test it, tune `gamepadLookSpeed` on `NEXION_Systems` — no code change needed.
+
+**Honest gap — the Terminal and Keypad puzzle screens don't support gamepad input yet:**
+- `TerminalUIController` reads free-text from a `TextField` via keyboard `KeyDownEvent`s. There's no virtual/on-screen keyboard, so a gamepad has no way to type a command at all right now.
+- `KeypadUIController`'s digit buttons work by mouse click (or keyboard digit keys via direct polling in `Update()`), but nothing maps a gamepad button/D-pad to a digit yet — no `InputSystemUIInputModule`/`EventSystem` is set up in the scene, so UI Toolkit's built-in gamepad navigation isn't wired either.
+
+Neither is required for the game's stated platform (PC/Windows standalone, mouse+keyboard assumed for typing puzzles), so this isn't necessarily a bug — but if you want a controller-only playthrough to work end to end, the keypad is the easier of the two to fix (finite digit set, could map D-pad/face buttons directly like the movement actions did); the terminal's free-text commands are the harder problem and would need either a from-scratch on-screen keyboard or redesigning it to be selection-based instead of typed.
+
+**Test now:** with a controller connected, hold left trigger (H-MODE) / right trigger (C-MODE) and confirm the Volume crossfade still happens, move with the left stick, look with the right stick and confirm it now turns at a normal speed, and press the button bound to Interact (West/X) on `Terminal_Firewall01` or `Keypad_Door01` — the screen should open, but you won't currently be able to input anything into it without falling back to keyboard/mouse.
+
+---
+
 ## What to do when you hit the next step
 
-Steps 6–9 in `steps.md` (dialogue, memory fragments, economy, audio) aren't built yet — nor is Sprint 1 of the actual puzzle content in [puzzles.md](puzzles.md). When you're ready for the next one, ask for it specifically — this file will get a new dated section appended the same way Sessions 1–3 did, so you always have one place to look for "what do I click."
+Steps 6–9 in `steps.md` (dialogue, memory fragments, economy, audio) aren't built yet — nor is Sprint 1 of the actual puzzle content in [puzzles.md](puzzles.md), nor the rebind-keys settings menu mentioned above. When you're ready for the next one, ask for it specifically — this file will get a new dated section appended the same way Sessions 1–4 did, so you always have one place to look for "what do I click."
 
 ---
 
@@ -175,3 +211,4 @@ Steps 6–9 in `steps.md` (dialogue, memory fragments, economy, audio) aren't bu
 | `TerminalPuzzle` | any terminal object (e.g. `Terminal_Firewall01`) | (none required — optionally wire `On Solved`) |
 | `KeypadUIController` | `KeypadUI` (needs a `UI Document` component too) | `Player Controller` → `Player`, `Player Interactor` → `Player` |
 | `KeypadPuzzle` | any keypad object (e.g. `Keypad_Door01`) | (none required — optionally wire `On Solved` / `On Failed`) |
+| `InputManager` | `NEXION_Systems` | `Input Actions` → `NexionControls` asset |

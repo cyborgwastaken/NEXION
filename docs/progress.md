@@ -70,6 +70,23 @@ Scripts written so far read devices directly (`Keyboard.current`, `Mouse.current
 - `KeypadPuzzle`'s code is a static string, not a generated cipher — matches the doc's "Keypad / Cipher System" name in spirit (numeric entry, environmental lock) but not yet the "pattern recognition, signal tracing" cipher-generation part. Revisit once a level actually needs procedurally varied codes rather than one fixed number per lock.
 - Two separate UI Toolkit screens now exist (Terminal, Keypad) sharing one `TerminalPanelSettings` asset — that's intentional (Panel Settings only controls rendering/scaling, not content) and keeps from needing a near-identical asset per puzzle type. If that naming bothers you later, renaming it to something generic like `NexionPanelSettings` is a safe find-and-reassign in the Inspector, not a code change.
 
+## Scripts implemented (Session 4 — 2026-08-27)
+
+| Script | Path | Status | Purpose |
+|---|---|---|---|
+| `NexionControls.inputactions` | `Assets/Settings/Input/` | done | The actual rebindable key/button bindings — Move, Look, Jump, Sprint, Interact, ModeHuman, ModeCPU, each with Keyboard&Mouse + Gamepad bindings |
+| `InputManager` | `Assets/Scripts/Core/InputManager.cs` | done | Looks up the Player action map once, exposes typed accessors (`MoveInput`, `LookDelta`, `JumpPressed`, etc.), persists binding overrides via `PlayerPrefs` |
+
+`ModeController`, `PlayerController`, and `PlayerInteractor` were edited in place to read from `InputManager.Instance` instead of `Keyboard.current`/`Gamepad.current` directly. No default keybind changed (WASD/mouse/Space/Shift/Q/E/F still work identically) — this was a pure data-driven-input refactor, prompted by needing to support a future key-rebind settings menu. Note: `PlayerController` had already picked up a basic Shift-sprint feature (added directly, outside this doc chain) before this session started — that's preserved and now reads from `InputManager.SprintHeld` like everything else.
+
+**Known gap:** the actual rebind UI (a settings screen that calls Input System's `PerformInteractiveRebinding`) doesn't exist. `InputManager.SaveBindings()`/`ResetBindings()` are there for that screen to call into later, but nothing calls them yet — rebinding is *possible*, not yet *player-facing*.
+
+**Deliberately out of scope:** Escape (pause/cursor-unlock) and the terminal/keypad UI's digit/Enter/Backspace keys stay hardcoded on `Keyboard.current` — those are UI/text-entry conventions, not the kind of action a rebind menu typically exposes.
+
+**Fixed (2026-08-27):** gamepad support was already wired into `NexionControls.inputactions` (left stick move, right stick look, etc.), but the right stick was nearly unusable — `InputManager.LookDelta` was reading the stick's normalized `-1..1` rate through the same `lookSensitivity` scalar tuned for mouse's per-frame pixel delta, making a fully-deflected stick barely turn the camera. Fixed by checking `lookAction.activeControl?.device is Gamepad` and scaling stick input by a separate `gamepadLookSpeed` field times `Time.deltaTime` instead; mouse look is untouched.
+
+**Known gap (controller):** the Terminal and Keypad puzzle UIs have no gamepad input path — `TerminalUIController` needs actual typed text (no virtual keyboard exists), and `KeypadUIController` has no D-pad/button-to-digit mapping and no `EventSystem`/`InputSystemUIInputModule` for UI Toolkit's gamepad navigation. Movement/look/jump/sprint/mode-switch/interact all work fine on a controller; opening a puzzle screen and actually solving it currently still requires keyboard/mouse. Not required for the stated PC/Windows platform target, but real work if a controller-only playthrough becomes a goal.
+
 ## Correction (2026-08-27) — challenges.md changes what "puzzle system" means here
 
 `docs/challenges.md` landed with a fully-specified 23-puzzle content design (exact solutions, UI layouts, fail states) — a different and more concrete layer than anything built so far. Reconciling it with the sessions above:

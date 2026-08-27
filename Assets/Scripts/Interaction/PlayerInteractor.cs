@@ -1,11 +1,12 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
+using Nexion.Core;
 
 namespace Nexion.Interaction
 {
     /// Raycasts from the camera each frame to find an IInteractable and fires it on
-    /// [F] / gamepad West button. Put this on the Player (or its camera) and give it
-    /// the camera's transform as the interaction origin.
+    /// the rebindable Interact action (see InputManager / NexionControls.inputactions
+    /// — default binding is [F] / gamepad West). Put this on the Player (or its
+    /// camera) and give it the camera's transform as the interaction origin.
     public class PlayerInteractor : MonoBehaviour
     {
         [SerializeField] private Transform interactionOrigin;
@@ -18,8 +19,7 @@ namespace Nexion.Interaction
         {
             CurrentTarget = FindTarget();
 
-            bool interactPressed = (Keyboard.current?.fKey.wasPressedThisFrame ?? false)
-                || (Gamepad.current?.buttonWest.wasPressedThisFrame ?? false);
+            bool interactPressed = InputManager.Instance != null && InputManager.Instance.InteractPressed;
 
             if (interactPressed && CurrentTarget != null && CurrentTarget.CanInteract)
                 CurrentTarget.Interact(gameObject);

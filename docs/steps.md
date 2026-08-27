@@ -32,6 +32,16 @@
 - [x] `DebugInteractable` (test-only)
 - [ ] On-screen interaction prompt UI (currently `InteractionPrompt` string exists but nothing displays it — needs a UI Toolkit or Canvas prompt bound to `PlayerInteractor.CurrentTarget`)
 
+### Step 3b — Rebindable Input Layer ✅ (Session 4)
+- [x] `Assets/Settings/Input/NexionControls.inputactions` — Move, Look, Jump, Sprint, Interact, ModeHuman, ModeCPU actions with Keyboard&Mouse + Gamepad bindings
+- [x] `InputManager` (`Nexion.Core.InputManager`) — central lookup, exposes typed accessors, `SaveBindings()`/`ResetBindings()`/`LoadBindings()` via `PlayerPrefs`
+- [x] `ModeController`, `PlayerController`, `PlayerInteractor` migrated off direct `Keyboard.current`/`Gamepad.current` polling onto `InputManager`
+- [ ] Actual rebind-keys settings menu (a screen where the player presses "rebind" then a new key) — `InputManager` has the persistence hooks ready, but nothing calls `PerformInteractiveRebinding` yet. This is real remaining work, not just wiring.
+- Deliberately out of scope: Escape (pause/cursor-unlock) and the terminal/keypad UI's digit/Enter/Backspace handling stay hardcoded — UI/text-entry conventions, not actions players expect to rebind.
+- [x] Gamepad bindings (left stick move, right stick look, South jump, left-stick-click sprint, West interact, triggers for H/C-MODE) — works with no PlayerInput/scheme setup since `InputManager` reads all bound devices at once
+- [x] Fixed: gamepad look was reading the stick's `-1..1` rate through the same scalar as mouse's per-frame pixel delta, making stick-look nearly motionless — `InputManager.LookDelta` now scales by device
+- [ ] Gamepad input for the Terminal/Keypad puzzle UIs — no virtual keyboard for the terminal's free text, no D-pad/button-to-digit mapping for the keypad, no `EventSystem`/`InputSystemUIInputModule` for UI Toolkit gamepad navigation. Not required for the PC/Windows-only platform target, but a real gap if a controller-only playthrough matters later.
+
 ### Step 4 — Terminal interaction shell ✅ (Session 2) — infrastructure, not puzzle content
 - [x] `TerminalPuzzle : MonoBehaviour, IInteractable` — text command interface
 - [x] Command parser (`scan`, `bypass <code>`, `exit`, `help`)

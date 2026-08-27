@@ -5,14 +5,16 @@ using Nexion.Core;
 
 namespace Nexion.Player
 {
-    /// First-person movement + look. Reads devices directly (no .inputactions asset
-    /// required). In C-MODE, movement input is delayed to match the design spec's
-    /// "physical precision degraded (0.3s input lag)" limitation of that mode.
+    /// First-person movement + look. Reads input via InputManager (rebindable Input
+    /// Actions) — see Assets/Settings/Input/NexionControls.inputactions for the actual
+    /// key/button bindings, not this script. In C-MODE, movement input is delayed to
+    /// match the design spec's "physical precision degraded (0.3s input lag)" limitation.
     [RequireComponent(typeof(CharacterController))]
     public class PlayerController : MonoBehaviour
     {
         [Header("Movement")]
         [SerializeField] private float walkSpeed = 4.5f;
+        [SerializeField] private float sprintSpeed = 7.5f;
         [SerializeField] private float gravity = -18f;
         [SerializeField] private float jumpHeight = 1.2f;
 
@@ -50,6 +52,8 @@ namespace Nexion.Player
 
         private void HandleCursorToggle()
         {
+            // Pause/cursor-unlock convention — deliberately left off the rebindable
+            // action set, same treatment as the terminal/keypad UI's Escape handling.
             if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
             {
                 bool locked = Cursor.lockState == CursorLockMode.Locked;
@@ -62,7 +66,7 @@ namespace Nexion.Player
         {
             if (Cursor.lockState != CursorLockMode.Locked) return;
 
-            Vector2 lookDelta = Mouse.current?.delta.ReadValue() ?? Vector2.zero;
+            Vector2 lookDelta = InputManager.Instance != null ? InputManager.Instance.LookDelta : Vector2.zero;
             transform.Rotate(Vector3.up * lookDelta.x * lookSensitivity);
 
             pitch = Mathf.Clamp(pitch - lookDelta.y * lookSensitivity, -maxLookAngle, maxLookAngle);
@@ -72,41 +76,25 @@ namespace Nexion.Player
 
         private void HandleMove()
         {
-            Vector2 rawInput = ReadMoveInput();
+            Vector2 rawInput = InputManager.Instance != null ? InputManager.Instance.MoveInput : Vector2.zero;
 
             bool cpuMode = ModeController.Instance != null && ModeController.Instance.IsCPU;
             Vector2 moveInput = cpuMode ? GetLaggedInput(rawInput) : rawInput;
 
-            Vector3 move = (transform.right * moveInput.x + transform.forward * moveInput.y) * walkSpeed;
+            bool sprinting = InputManager.Instance != null && InputManager.Instance.SprintHeld;
+            float speed = sprinting ? sprintSpeed : walkSpeed;
+
+            Vector3 move = (transform.right * moveInput.x + transform.forward * moveInput.y) * speed;
 
             if (controller.isGrounded)
             {
                 verticalVelocity = -1f;
-                if (Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame)
+                if (InputManager.Instance != null && InputManager.Instance.JumpPressed)
                     verticalVelocity = Mathf.Sqrt(jumpHeight * -2f * gravity);
             }
             verticalVelocity += gravity * Time.deltaTime;
 
             controller.Move((move + Vector3.up * verticalVelocity) * Time.deltaTime);
-        }
-
-        private Vector2 ReadMoveInput()
-        {
-            Vector2 input = Vector2.zero;
-            var kb = Keyboard.current;
-            if (kb != null)
-            {
-                if (kb.wKey.isPressed) input.y += 1;
-                if (kb.sKey.isPressed) input.y -= 1;
-                if (kb.dKey.isPressed) input.x += 1;
-                if (kb.aKey.isPressed) input.x -= 1;
-            }
-
-            var pad = Gamepad.current;
-            if (pad != null)
-                input += pad.leftStick.ReadValue();
-
-            return Vector2.ClampMagnitude(input, 1f);
         }
 
         private Vector2 GetLaggedInput(Vector2 currentInput)
