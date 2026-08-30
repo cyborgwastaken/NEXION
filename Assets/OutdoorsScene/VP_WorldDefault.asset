@@ -17,8 +17,8 @@ MonoBehaviour:
     m_OverrideState: 1
     m_Value: 0
   color:
-    m_OverrideState: 0
-    m_Value: {r: 0.019607844, g: 0, b: 0.039215688, a: 1}
+    m_OverrideState: 1
+    m_Value: {r: 0.5271271, g: 0.58248913, b: 0.83396226, a: 1}
   center:
     m_OverrideState: 0
     m_Value: {x: 0.5, y: 0.5}
@@ -274,14 +274,14 @@ MonoBehaviour:
     m_OverrideState: 1
     m_Value: 1
   colorMode:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 1
   color:
     m_OverrideState: 0
     m_Value: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   tint:
-    m_OverrideState: 0
-    m_Value: {r: 1, g: 1, b: 1, a: 1}
+    m_OverrideState: 1
+    m_Value: {r: 0.4392157, g: 0.5036143, b: 0.8509804, a: 1}
   maxFogDistance:
     m_OverrideState: 0
     m_Value: 5000
@@ -302,7 +302,7 @@ MonoBehaviour:
     m_Value: 50
   meanFreePath:
     m_OverrideState: 1
-    m_Value: 18.5
+    m_Value: 40
   enableVolumetricFog:
     m_OverrideState: 1
     m_Value: 1

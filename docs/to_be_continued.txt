@@ -1,0 +1,161 @@
+Ok now our focus is creating and completting the player character. so for that i have imported 4 pacakges from unity asset store. 
+1. Advanced First-Person Controller - MOVEMENT
+
+- Walk and run with configurable speed and sharpness
+
+- Single and multi-jump (double jump, triple, etc.)
+
+- Endurance system — running and jumping consume stamina
+
+- Air control factor (0–1) for smooth air steering
+
+- Slope handling — configurable slope limit, gravity sliding on steep surfaces, uphill/downhill speed modulation
+
+- Crouch with Hold and Toggle modes, ceiling detection, smooth collider transition
+
+- Physics-based via Rigidbody — works with your existing physics setup
+
+
+LIFECYCLE
+
+- Health and shield with auto-recovery
+
+- Shield absorbs damage before health
+
+- Frenzy state at low health for special effects
+
+- Full damage → death → respawn cycle
+
+
+CAMERA
+
+- Mouse look with framerate-independent sensitivity, inversion, and clamping
+
+- Automatic mouse/gamepad detection — switching mid-play works seamlessly
+
+- Aim zoom (right click)
+
+- Speed FOV — field of view increases with velocity
+
+- Head bobbing with run multiplier
+
+- Camera shake via lens shift (Physical Camera)
+
+- RotateYaw for programmatic camera turns (cutscenes, platforms)
+
+
+EXTENSIONS
+
+- AFPC ships with five ready-to-use extensions
+
+- Footsteps for surface-aware audio
+
+- Interaction for raycast-based object triggering
+
+- Leaning for smooth left/right camera tilt
+
+- Step Climbing for automatic ledge traversal
+
+- Moving Platform Support — automatic kinematic platform tracking with velocity inheritance and yaw rotation
+
+- Each extension is self-contained and can be added or removed independently
+
+
+UI
+
+- UI Toolkit HUD (UXML + USS)
+
+- Health, shield, and endurance bars with percentage values
+
+- Full-screen damage flash effect
+
+- Input hints overlay
+
+- Fully customizable via stylesheet
+
+
+INPUT
+
+- Unity Input System (New)
+
+- Keyboard/Mouse and Gamepad bindings included
+
+- Easy to replace — just set the public input fields from your own system
+2. Free Test Character Asuna - This pack contains the free test character Asuna. The character uses Unitys mecanim system and is designed for animation re-targeting.
+
+
+You can use this free test character for prototyping, etc. and test out if my other character models will fit your needs. If the test character works fine all my other characters will work as well.
+
+
+More characters are available here (https://assetstore.unity.com/lists/scifi-characters-9071492093469)
+
+
+No AI-“art” was used in the creation of this model.
+
+
+- Free test character Asuna
+
+- Animations are stored in separate FBX files
+
+- All animations are in place, character must be moved with a character controller
+
+- Character controller is not included. You have to write your own.
+
+- Character uses Unitys mecanim system (humanoid rig)
+
+- Character is designed for animation re-targeting
+
+- 52 facial blendshapes compatible with Apple Arkit
+
+- Included equipment: scifi rifle, scifi pistol, holster
+
+- Optional armor
+
+- 10 different eye colors
+
+- 5 different hair colors
+
+- 4 different texture sets
+
+- PSDs with intact layers are included
+
+- PBR textures (metallic)
+
+- Ready to use prefabs of all models are included
+
+- Texture sizes are 4096 (body, head, equipment), 2048 (armor) and 1024 (ammunition)
+
+- Tris count character ca. 58600
+
+- Final tris count depends on how many weapons/armor/equipment parts are used for the character
+3. 3D Modern Menu UI - 3D Modern Menu is a full 3D World Space native uGUI Complete Modern Main Menu template with a Theme Editor and TextMeshPro integration. Download and implement it into your project with just a few clicks!
+
+
+
+FEATURES
+
+- 2 Sample Scenes (Desktop & Mobile Templates)
+
+- Full Animations for Buttons and Panels
+
+- Functioning Settings Menu w/ Placeholder Key BIndings
+
+- Theme Editor for Image and Text Components
+
+- Functioning Loading Screen w/ Animated Bar
+
+- Drag + Drop Prefab Ready Out-Of-The-Box
+
+- Text Mesh Pro Integration
+
+- 7 Custom Cursors
+
+- Complete Online Documentation
+
+- FREE Updates
+
+- User-Friendly Code w/ Tool Tips
+
+
+
+ONLINE DOCUMENTATION (https://drive.google.com/drive/folders/1H8JQWG6lDex2-3PXzoxFNU5EHb5uBf3m?usp=sharing) | WEBSITE (https://www.slimui.com/) | DEMO (https://drive.google.com/file/d/1YwXyNnf6oWyqbAyIPHSrV-AMTlpUnJe-/view) | DISCORD (https://discord.gg/7cK4KBf)

@@ -35,6 +35,9 @@ namespace Nexion.Core
         private InputAction interactAction;
         private InputAction modeHumanAction;
         private InputAction modeCpuAction;
+        private InputAction damageAction;
+        private InputAction healAction;
+        private InputAction respawnAction;
 
         public Vector2 MoveInput => moveAction?.ReadValue<Vector2>() ?? Vector2.zero;
 
@@ -55,6 +58,12 @@ namespace Nexion.Core
         public bool InteractPressed => interactAction?.WasPressedThisFrame() ?? false;
         public bool HumanHeld => modeHumanAction?.IsPressed() ?? false;
         public bool CpuHeld => modeCpuAction?.IsPressed() ?? false;
+
+        /// Debug/test-only actions (R/H/T) — see PlayerLifecycle, which is the only
+        /// consumer and compiles its usage out of release builds.
+        public bool DamagePressed => damageAction?.WasPressedThisFrame() ?? false;
+        public bool HealPressed => healAction?.WasPressedThisFrame() ?? false;
+        public bool RespawnPressed => respawnAction?.WasPressedThisFrame() ?? false;
 
         private void Awake()
         {
@@ -79,6 +88,9 @@ namespace Nexion.Core
             interactAction = player.FindAction("Interact");
             modeHumanAction = player.FindAction("ModeHuman");
             modeCpuAction = player.FindAction("ModeCPU");
+            damageAction = player.FindAction("Damage");
+            healAction = player.FindAction("Heal");
+            respawnAction = player.FindAction("Respawn");
 
             LoadBindings();
         }

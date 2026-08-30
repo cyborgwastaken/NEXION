@@ -191,6 +191,47 @@ Neither is required for the game's stated platform (PC/Windows standalone, mouse
 
 ---
 
+## Session 5 (2026-08-28) — AFPC lifecycle + Asuna FP viewmodel
+
+**Why:** Session 1's `PlayerController`/`PlayerInteractor` stay exactly as they are — they're already wired into the C-MODE input-lag penalty and the puzzle-interaction raycast, and that's not being redone. What NEXION didn't have at all until now was (a) any health/damage/death state for the player, and (b) a visible body. This session cherry-picks just the `Lifecycle` half of the imported AFPC asset (health/shield/damage/death/respawn) — not its Rigidbody `Movement`, camera `Overview`, or extensions, none of which this project uses — and adds Asuna (`Free Test Character Asuna` asset) as a first-person arms viewmodel holding a pistol. No combat design exists yet, so nothing here fires a weapon; it's equip-and-display only.
+
+Scripts landed this session: `PlayerLifecycle` (`Assets/Scripts/Player/PlayerLifecycle.cs`), `PlayerViewmodel` (`Assets/Scripts/Player/PlayerViewmodel.cs`), `PlayerHUDBinder` (`Assets/Scripts/UI/PlayerHUDBinder.cs`). `Assets/AFPC/Scripts/UI/AFPCUI.cs` (+ its `.uxml`/`.uss`) was trimmed down to just health/shield bars and the damage flash — the stock endurance bar, interaction-label, and extensions-panel all depended on AFPC's `Hero`, which isn't in this project, so they're gone. Three new debug-only input actions (`Damage`/`Heal`/`Respawn`, bound to `R`/`H`/`T`) were added to `NexionControls.inputactions` so you can test the lifecycle system without a real damage source yet.
+
+**Assembly note, in case you ever add more AFPC-side scripts:** `Assets/AFPC/AFPC.asmdef` compiles as its own assembly and can't reference `Nexion.*` types (Assembly-CSharp compiles *after* it, so that dependency direction is impossible). That's exactly why `AFPCUI` is a "dumb" view now (`SetHealth`/`SetShield`/`TriggerDamageFX`, no model reference) and `PlayerHUDBinder` — which *can* see both, since it lives in Assembly-CSharp — does the actual wiring between `PlayerLifecycle` and `AFPCUI`.
+
+### Step 13 — Player Lifecycle
+
+1. Select `Player`.
+2. Add Component → `Player Lifecycle` (`Nexion.Player.PlayerLifecycle`). No fields need setting — `Reference Health`/`Reference Shield` default to 100 each on the nested `Lifecycle` struct if you want to tune them.
+3. This is all it takes to wire death/respawn into movement: on death it disables the `Player Controller` component (freezing move/look/jump exactly like C-MODE input lag doesn't — it's a hard freeze, not a delay); on respawn it re-enables it.
+
+**Not built:** teleporting the player back to a checkpoint on respawn. There's no checkpoint system yet, so `Respawn()` only restores health/shield — you'll still be standing wherever you died.
+
+### Step 14 — HUD
+
+1. Drag `Assets/AFPC/Scripts/UI/AFPCUI.prefab` into the Hierarchy (root level is fine, same as `TerminalUI`/`KeypadUI`).
+2. On that object, Add Component → `Player HUD Binder` (`Nexion.UI.PlayerHUDBinder`).
+   - **Hud** → drag the same object in (it already has the `AFPCUI` component from the prefab).
+   - **Player Lifecycle** → drag `Player` in (its `Player Lifecycle` component from Step 13).
+
+**Test now:** Play mode. HUD shows SHIELD/HP bars at 100% and a control-hint list bottom-right (now includes INTERACT/F alongside MOVE/JUMP/RUN, and the DAMAGE/HEAL/RESPAWN debug binds). Press `R` a few times — HP bar drops, screen flashes red briefly, shield bar stays put until HP would go below the shield-first-absorption math (shield takes damage before health — press `R` once and check shield instead, it'll usually be shield that moves first). Get HP to 0 — movement/look freezes (confirm WASD/mouse do nothing) and the `Player Controller` component shows unchecked/disabled in the Inspector. Press `T` — HP/shield refill to 100%, movement/look come back.
+
+### Step 15 — Asuna FP viewmodel
+
+1. Under `PlayerCamera`, create an empty child named `PlayerViewmodel`.
+2. Drag `Assets/FreeTestCharacterAsuna/Prefabs/FreeTestCharacterAsunaMasterPrefab.prefab` in as a child of `PlayerViewmodel` (or rename the prefab instance itself to `PlayerViewmodel` if you'd rather skip the extra empty — either works, the component in the next step just needs an `Animator` to point at).
+3. Position/scale it like a standard FP arms rig — small forward-and-down offset from the camera so it reads as "your own arms" rather than a full body floating in view. This is the simple single-camera approach: no separate render layer/camera stack, so it can clip into geometry at very close range. That's a known, common limitation of this simpler setup — a dual-camera HDRP stack to eliminate it is a documented follow-up, not required now.
+4. On the prefab instance's `Animator` component, assign `Assets/FreeTestCharacterAsuna/FBX/Animations/FreeTestAnimationController.controller` as the **Controller** (it should already be set from the prefab, but double check).
+5. Add Component → `Player Viewmodel` (`Nexion.Player.PlayerViewmodel`) on `PlayerViewmodel`.
+   - **Viewmodel Animator** → drag in the Asuna instance's `Animator`.
+   - **Weapon Socket** → expand the rig hierarchy and find the right-hand bone (name isn't knowable ahead of time — look for something like `hand_r`/`RightHand` under the arm chain) and drag that transform in. This is a from-scratch hand-socket pick since AFPC's `Movement`/`Overview` (which this project doesn't use) never needed one.
+   - **Weapon Prefab** → `Assets/FreeTestCharacterAsuna/Prefabs/CharacterStandardEquipment/ScifiPistolMNL21MasterPrefab.prefab` (recommended default — smaller and less combat-forward than the rifle, easy to swap later).
+   - **Hold State Name** → open `FreeTestAnimationController` in the Animator window and check the exact state name for the pistol-hold pose (likely `Pistol`, matching the `010Pistol.fbx` clip it's built from — confirm before Play mode, `Animator.Play` silently no-ops on a name that doesn't match).
+
+**Test now:** Play mode. The pistol should spawn attached to Asuna's hand and the arms should hold the idle pose (not T-pose — if you see a T-pose, the **Hold State Name** doesn't match an actual state in the controller). Look around and confirm the interaction raycast (Step 3, `PlayerCamera`-based) still hits `Terminal_Firewall01`/`Keypad_Door01` normally — the viewmodel is a separate child and shouldn't be in `Interactable Mask`'s way, but if it somehow blocks raycasts, put `PlayerViewmodel` on its own layer and exclude that layer from `Interactable Mask` on `Player Interactor`.
+
+---
+
 ## What to do when you hit the next step
 
 Steps 6–9 in `steps.md` (dialogue, memory fragments, economy, audio) aren't built yet — nor is Sprint 1 of the actual puzzle content in [puzzles.md](puzzles.md), nor the rebind-keys settings menu mentioned above. When you're ready for the next one, ask for it specifically — this file will get a new dated section appended the same way Sessions 1–4 did, so you always have one place to look for "what do I click."
@@ -212,3 +253,7 @@ Steps 6–9 in `steps.md` (dialogue, memory fragments, economy, audio) aren't bu
 | `KeypadUIController` | `KeypadUI` (needs a `UI Document` component too) | `Player Controller` → `Player`, `Player Interactor` → `Player` |
 | `KeypadPuzzle` | any keypad object (e.g. `Keypad_Door01`) | (none required — optionally wire `On Solved` / `On Failed`) |
 | `InputManager` | `NEXION_Systems` | `Input Actions` → `NexionControls` asset |
+| `PlayerLifecycle` | `Player` | (none — self-contained; requires `Player Controller` on the same object) |
+| `AFPCUI` | `AFPCUI` prefab instance (needs `UI Document`, comes with the prefab) | (none — driven externally by `PlayerHUDBinder`) |
+| `PlayerHUDBinder` | same object as `AFPCUI` | `Hud` → its own `AFPCUI` component, `Player Lifecycle` → `Player` |
+| `PlayerViewmodel` | `PlayerViewmodel` (child of `PlayerCamera`) | `Viewmodel Animator` → Asuna's `Animator`, `Weapon Socket` → hand bone, `Weapon Prefab` → e.g. `ScifiPistolMNL21MasterPrefab` |

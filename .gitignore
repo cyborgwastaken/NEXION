@@ -120,3 +120,17 @@ InitTestScene*.unity*
 # accidental commit, that's a separate deliberate step — don't do it as a side effect
 # of routine work.
 /Assets/Imported/
+
+# Asset Store packages imported in Session 5 (2026-08-31) — re-import from the Asset
+# Store, don't commit. AFPC + 3D Modern Menu UI (SlimUI) are paid/license-restricted;
+# Asuna + MilkyWay are free but large. The Session 5 scripts under Assets/Scripts/
+# have a compile-time dependency on the AFPC namespace, so a fresh clone needs AFPC
+# re-imported before the project will compile.
+/[Aa]ssets/AFPC/
+/[Aa]ssets/AFPC.meta
+/[Aa]ssets/FreeTestCharacterAsuna/
+/[Aa]ssets/FreeTestCharacterAsuna.meta
+/[Aa]ssets/MilkyWay/
+/[Aa]ssets/MilkyWay.meta
+/[Aa]ssets/SlimUI/
+/[Aa]ssets/SlimUI.meta
